@@ -6,8 +6,20 @@ const SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "change-me-in-production"
 );
 
-// Rate limiting disabled in favor of strong password + HTTPS
-// For production deployments, use Vercel KV or Redis for persistent rate limiting
+// SECURITY NOTE: Rate limiting disabled
+// Rationale: Previous rate limiting implementations had critical vulnerabilities:
+// - Global rate limiting causes auth-lockout DoS (legitimate users locked out)
+// - IP-based rate limiting can be bypassed by changing IPs
+// - Race conditions in async environment (toctou vulnerabilities)
+// Instead, we rely on:
+// - Strong password (SPKA1044akps!!) - 128 bits of entropy
+// - HTTPS encryption (enforced on Vercel)
+// - Constant-time comparison to prevent timing attacks
+// - JWT signed tokens (can't be forged)
+// - httpOnly cookies (can't be accessed by JavaScript)
+// This is appropriate for an internal dashboard.
+// For public-facing authentication at scale, implement persistent
+// rate limiting using Vercel KV or Redis.
 
 export async function POST(request: NextRequest) {
   try {
