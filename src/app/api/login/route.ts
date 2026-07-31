@@ -6,63 +6,53 @@ const SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "change-me-in-production"
 );
 
-// Rate limiting: max 5 attempts per 15 minutes
-// Note: In production, use a persistent service like Redis or Vercel KV
-const loginAttempts = new Map<string, { count: number; resetTime: number }>();
-const MAX_ATTEMPTS = 5;
-const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-const CLEANUP_INTERVAL = 60 * 1000; // Clean up every minute
-let lastCleanup = Date.now();
+// Global rate limiting with exponential backoff
+// Tracks failed attempts globally to prevent brute force attacks
+let failedAttempts = 0;
+let lastFailureTime = 0;
+const BASE_DELAY_MS = 1000; // 1 second base delay
 
-function cleanupOldEntries(): void {
+function getBackoffDelay(): number {
   const now = Date.now();
-  if (now - lastCleanup < CLEANUP_INTERVAL) return;
+  const timeSinceLastFailure = now - lastFailureTime;
 
-  for (const [key, value] of loginAttempts.entries()) {
-    if (now > value.resetTime) {
-      loginAttempts.delete(key);
-    }
+  // Reset if more than 1 hour has passed
+  if (timeSinceLastFailure > 60 * 60 * 1000) {
+    failedAttempts = 0;
+    return 0;
   }
-  lastCleanup = now;
 
-  // Prevent unbounded growth - limit to 1000 entries
-  if (loginAttempts.size > 1000) {
-    const entriesToDelete = loginAttempts.size - 500;
-    let deleted = 0;
-    for (const [key] of loginAttempts.entries()) {
-      if (deleted >= entriesToDelete) break;
-      loginAttempts.delete(key);
-      deleted++;
-    }
-  }
+  // Exponential backoff: 2^(attempts-1) * base delay, max 5 minutes
+  const delay = Math.min(
+    Math.pow(2, Math.max(0, failedAttempts - 1)) * BASE_DELAY_MS,
+    5 * 60 * 1000
+  );
+
+  return Math.max(0, delay - timeSinceLastFailure);
 }
 
-function checkRateLimit(ip: string): boolean {
-  cleanupOldEntries();
+function checkRateLimit(): { allowed: boolean; retryAfter?: number } {
+  const delay = getBackoffDelay();
 
-  const now = Date.now();
-  const record = loginAttempts.get(ip);
-
-  if (!record || now > record.resetTime) {
-    loginAttempts.set(ip, { count: 1, resetTime: now + WINDOW_MS });
-    return true;
+  if (delay > 0) {
+    return { allowed: false, retryAfter: Math.ceil(delay / 1000) };
   }
 
-  if (record.count >= MAX_ATTEMPTS) {
-    return false;
-  }
-
-  record.count++;
-  return true;
+  return { allowed: true };
 }
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const rateLimit = checkRateLimit();
 
-  if (!checkRateLimit(ip)) {
+  if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: "Too many login attempts. Try again later." },
-      { status: 429 }
+      {
+        error: `Too many login attempts. Try again in ${rateLimit.retryAfter} seconds.`,
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfter) },
+      }
     );
   }
 
@@ -90,6 +80,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (isValid) {
+      // Reset failed attempts on successful login
+      failedAttempts = 0;
+      lastFailureTime = 0;
+
       const token = await new SignJWT({ authenticated: true })
         .setProtectedHeader({ alg: "HS256" })
         .setExpirationTime("7d")
@@ -105,6 +99,10 @@ export async function POST(request: NextRequest) {
       });
       return response;
     }
+
+    // Record failed attempt
+    failedAttempts++;
+    lastFailureTime = Date.now();
 
     return NextResponse.json(
       { error: "Invalid password" },
