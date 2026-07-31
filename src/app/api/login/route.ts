@@ -6,20 +6,50 @@ const SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "change-me-in-production"
 );
 
-// Simple in-memory rate limiting (in production, use Redis or similar)
+// Rate limiting: max 5 attempts per 15 minutes
+// Note: In production, use a persistent service like Redis or Vercel KV
 const loginAttempts = new Map<string, { count: number; resetTime: number }>();
+const MAX_ATTEMPTS = 5;
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const CLEANUP_INTERVAL = 60 * 1000; // Clean up every minute
+let lastCleanup = Date.now();
+
+function cleanupOldEntries(): void {
+  const now = Date.now();
+  if (now - lastCleanup < CLEANUP_INTERVAL) return;
+
+  for (const [key, value] of loginAttempts.entries()) {
+    if (now > value.resetTime) {
+      loginAttempts.delete(key);
+    }
+  }
+  lastCleanup = now;
+
+  // Prevent unbounded growth - limit to 1000 entries
+  if (loginAttempts.size > 1000) {
+    const entriesToDelete = loginAttempts.size - 500;
+    let deleted = 0;
+    for (const [key] of loginAttempts.entries()) {
+      if (deleted >= entriesToDelete) break;
+      loginAttempts.delete(key);
+      deleted++;
+    }
+  }
+}
 
 function checkRateLimit(ip: string): boolean {
+  cleanupOldEntries();
+
   const now = Date.now();
   const record = loginAttempts.get(ip);
 
   if (!record || now > record.resetTime) {
-    loginAttempts.set(ip, { count: 1, resetTime: now + 15 * 60 * 1000 }); // 15 min window
+    loginAttempts.set(ip, { count: 1, resetTime: now + WINDOW_MS });
     return true;
   }
 
-  if (record.count >= 5) {
-    return false; // Max 5 attempts per 15 minutes
+  if (record.count >= MAX_ATTEMPTS) {
+    return false;
   }
 
   record.count++;
