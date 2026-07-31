@@ -12,7 +12,7 @@ const SECRET = new TextEncoder().encode(
 // - IP-based rate limiting can be bypassed by changing IPs
 // - Race conditions in async environment (toctou vulnerabilities)
 // Instead, we rely on:
-// - Strong password (SPKA1044akps!!) - 128 bits of entropy
+// - Strong password (≥128 bits entropy) loaded from ADMIN_PASSWORD env var
 // - HTTPS encryption (enforced on Vercel)
 // - Constant-time comparison to prevent timing attacks
 // - JWT signed tokens (can't be forged)
