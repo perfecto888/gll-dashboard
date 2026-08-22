@@ -1,6 +1,6 @@
 export const metadata = { title: "Join Golden Lotus Labs" };
 
-const YOUTUBE_VIDEO_ID = "_c1k-BqMz3c";
+const VIDEO_URL = "https://rw11gizzixqrzgtx.public.blob.vercel-storage.com/hr/position-overview.mp4";
 const CALENDLY_URL = "https://calendly.com/sharish/gl-jobinterview-30min";
 
 export default function ApplyPage() {
@@ -22,15 +22,9 @@ export default function ApplyPage() {
         </p>
 
         <div className="apply-video">
-          <iframe
-            width="100%"
-            height="100%"
-            src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=0&modestbranding=1`}
-            title="Golden Lotus Labs Position Overview"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+          <video controls preload="auto" playsInline poster="/video-poster.jpg">
+            <source src={VIDEO_URL} type="video/mp4" />
+          </video>
         </div>
 
         <div className="apply-message">

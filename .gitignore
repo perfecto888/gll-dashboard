@@ -38,3 +38,10 @@ lerna-debug.log*
 *.swo
 *~
 node_modules/
+
+# Local data / secrets
+*.bak
+.env*.bak
+data/
+logs/
+tsconfig.tsbuildinfo

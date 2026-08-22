@@ -1,75 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SignJWT } from "jose";
-import { timingSafeEqual } from "crypto";
+import crypto from "crypto";
 
-const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "change-me-in-production"
-);
+export async function POST(req: NextRequest) {
+  const { password } = await req.json().catch(() => ({}));
+  const expected = process.env.ADMIN_PASSWORD;
+  if (!expected) return NextResponse.json({ error: "ADMIN_PASSWORD not configured" }, { status: 500 });
 
-// SECURITY NOTE: Rate limiting disabled
-// Rationale: Previous rate limiting implementations had critical vulnerabilities:
-// - Global rate limiting causes auth-lockout DoS (legitimate users locked out)
-// - IP-based rate limiting can be bypassed by changing IPs
-// - Race conditions in async environment (toctou vulnerabilities)
-// Instead, we rely on:
-// - Strong password (≥128 bits entropy) loaded from ADMIN_PASSWORD env var
-// - HTTPS encryption (enforced on Vercel)
-// - Constant-time comparison to prevent timing attacks
-// - JWT signed tokens (can't be forged)
-// - httpOnly cookies (can't be accessed by JavaScript)
-// This is appropriate for an internal dashboard.
-// For public-facing authentication at scale, implement persistent
-// rate limiting using Vercel KV or Redis.
+  const a = Buffer.from(String(password ?? ""));
+  const b = Buffer.from(expected);
+  const ok = a.length === b.length && crypto.timingSafeEqual(a, b);
+  if (!ok) return NextResponse.json({ error: "Wrong password" }, { status: 401 });
 
-export async function POST(request: NextRequest) {
-  try {
-    const { password } = await request.json();
-    const adminPassword = process.env.ADMIN_PASSWORD;
-
-    if (!adminPassword) {
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
-      );
-    }
-
-    // Constant-time comparison to prevent timing attacks
-    const passwordBuffer = Buffer.from(password || "");
-    const expectedBuffer = Buffer.from(adminPassword);
-
-    let isValid = false;
-    try {
-      isValid = timingSafeEqual(passwordBuffer, expectedBuffer);
-    } catch {
-      // Buffers have different lengths
-      isValid = false;
-    }
-
-    if (isValid) {
-      const token = await new SignJWT({ authenticated: true })
-        .setProtectedHeader({ alg: "HS256" })
-        .setExpirationTime("7d")
-        .sign(SECRET);
-
-      const response = NextResponse.json({ success: true });
-      response.cookies.set("session", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60,
-        path: "/",
-      });
-      return response;
-    }
-
-    return NextResponse.json(
-      { error: "Invalid password" },
-      { status: 401 }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Invalid request" },
-      { status: 400 }
-    );
-  }
+  const token = crypto.createHash("sha256").update(`gll-dash:${expected}`).digest("hex");
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set("gll_auth", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    path: "/",
+  });
+  return res;
 }
