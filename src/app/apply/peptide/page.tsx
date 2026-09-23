@@ -1,6 +1,6 @@
 export const metadata = { title: "Peptide Sales Position — Golden Lotus Labs" };
 
-const YOUTUBE_VIDEO_ID = "fG9gfJU6y1c";
+const YOUTUBE_VIDEO_ID = "-FH8Ijyqsxg";
 const CALENDLY_URL = "https://calendly.com/sharish/gl-jobinterview-30min";
 
 export default function PeptideApplyPage() {
@@ -29,7 +29,7 @@ export default function PeptideApplyPage() {
           <iframe
             width="100%"
             height="100%"
-            src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=0&modestbranding=1`}
+            src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=0&modestbranding=1&controls=0`}
             title="Golden Lotus Labs - Peptide Sales Position Overview"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
