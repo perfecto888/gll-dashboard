@@ -1,4 +1,4 @@
-/* /apply/peptide only — matches goldenlotuslabs.com (black, gold, Cormorant + DM Sans).
+/* /apply/peptide, /apply/ns100, /apply/webinar — matches goldenlotuslabs.com (black, gold, Cormorant + DM Sans).
    Every rule is scoped under .lux-page so the dashboard and /apply keep their own look. */
 .lux-page {
   --lux-bg: #090909;
@@ -131,7 +131,43 @@
 }
 .lux-footer a { color: var(--lux-gold); text-decoration: none; }
 
+/* "coming soon" panel shown until a video ID is set */
+.lux-video-pending {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  background: radial-gradient(ellipse at center, rgba(201, 168, 76, 0.07), transparent 70%), #0d0d0d;
+}
+.lux-video-pending p { margin: 14px 0 0; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--lux-muted); }
+.lux-play {
+  width: 64px; height: 64px; margin: 0 auto; border: 1px solid var(--lux-gold); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; color: var(--lux-gold); font-size: 20px; padding-left: 4px;
+}
+
+.lux-tagline { font-size: 15px; letter-spacing: 0.04em; color: var(--lux-muted); margin: 14px 0 0; }
+
+.lux-points { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; width: 100%; margin-bottom: 48px;
+  background: var(--lux-gold-border); border: 1px solid var(--lux-gold-border); }
+.lux-point { background: var(--lux-bg); padding: 26px 22px; text-align: left; }
+.lux-point-num { font-family: var(--lux-display), Georgia, serif; font-size: 28px; color: var(--lux-gold); line-height: 1; margin-bottom: 12px; }
+.lux-point h3 { font-size: 15px; font-weight: 600; margin: 0 0 8px; color: var(--lux-text); }
+.lux-point p { font-size: 14px; line-height: 1.65; color: var(--lux-muted); margin: 0; }
+
+.lux-card {
+  width: 100%; max-width: 720px; border: 1px solid var(--lux-gold-border); border-top: 2px solid var(--lux-gold);
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.05), transparent 60%), #0d0d0d;
+  padding: 44px 40px 36px; display: flex; flex-direction: column; align-items: center;
+}
+.lux-card > p { font-size: 16px; line-height: 1.75; max-width: 560px; margin: 0 0 22px; }
+.lux-card .lux-eyebrow { margin-bottom: 12px; }
+.lux-card-title { font-family: var(--lux-display), Georgia, serif; font-weight: 400; font-size: 40px; line-height: 1.1; margin: 0 0 20px; }
+.lux-card-title em { font-style: italic; color: var(--lux-gold-light); }
+.lux-card .lux-card-price { font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--lux-gold); margin-bottom: 26px; }
+.lux-card .lux-fine { font-size: 12px; line-height: 1.6; color: var(--lux-muted); max-width: 480px; margin: 22px 0 0; }
+
+@media (max-width: 760px) { .lux-points { grid-template-columns: 1fr; } }
+
 @media (max-width: 600px) {
+  .lux-card { padding: 32px 20px 28px; }
+  .lux-card-title { font-size: 34px; }
   .lux-wrap { padding: 44px 0 40px; }
   .lux-lead, .lux-message { font-size: 15px; }
   .lux-cta { width: 100%; justify-content: center; padding: 18px 20px; }
