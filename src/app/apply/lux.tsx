@@ -22,7 +22,14 @@ export function LuxPage({ sub, children }: { sub: string; children: React.ReactN
 }
 
 /** YouTube embed in the gold frame, or a "coming soon" panel until a video ID is set. */
-export function LuxVideo({ videoId, title, pending }: { videoId: string; title: string; pending: string }) {
+// videoId is a YouTube ID; pass loomId instead for a Loom recording (the id in loom.com/share/<id>).
+export function LuxVideo({ videoId = "", loomId = "", title, pending }: { videoId?: string; loomId?: string; title: string; pending: string }) {
+  if (loomId)
+    return (
+      <div className="lux-video lux-video-loom">
+        <iframe src={`https://www.loom.com/embed/${loomId}`} title={title} allowFullScreen />
+      </div>
+    );
   if (!videoId)
     return (
       <div className="lux-video lux-video-pending">

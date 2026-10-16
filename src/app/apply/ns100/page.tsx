@@ -2,8 +2,8 @@ import { LuxPage, LuxVideo } from "../lux";
 
 export const metadata = { title: "NS100 Device Sales Position — Golden Lotus Labs" };
 
-// Paste the YouTube video ID here once the NS100 overview is recorded (the part after "v=").
-const YOUTUBE_VIDEO_ID = "";
+// Loom recording of the NS100 position overview (loom.com/share/<id>).
+const LOOM_VIDEO_ID = "9168df4569d747818be833d736c0d8a8";
 const CALENDLY_URL = "https://calendly.com/sharish/gll-job-interview-30-min-clone";
 
 // Copy stays inside the NS100 practice deck's own framing: provider-directed, outcomes vary.
@@ -23,7 +23,7 @@ export default function Ns100ApplyPage() {
         you&apos;d be calling on, and how compensation works.
       </p>
 
-      <LuxVideo videoId={YOUTUBE_VIDEO_ID} title="Golden Lotus Labs - NS100 Sales Position Overview" pending="Position overview video coming soon" />
+      <LuxVideo loomId={LOOM_VIDEO_ID} title="Golden Lotus Labs - NS100 Sales Position Overview" pending="Position overview video coming soon" />
 
       <div className="lux-points">
         <div className="lux-point">
