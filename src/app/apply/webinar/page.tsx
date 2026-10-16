@@ -36,7 +36,7 @@ export default function WebinarPage() {
           serious medical sales professionals. Members get weekly strategy calls, deal reviews,
           shared playbooks and a network of people building the same kind of business.
         </p>
-        <p className="lux-card-price">$500 / month &nbsp;·&nbsp; by application</p>
+        <p className="lux-card-price">By application only</p>
         <a className="lux-cta" href={INNER_CIRCLE_URL} target="_blank" rel="noreferrer">
           Apply to the Inner Circle <span aria-hidden="true">→</span>
         </a>
