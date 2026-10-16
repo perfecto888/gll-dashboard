@@ -32,9 +32,10 @@ export default function WebinarPage() {
           The <em>Inner Circle</em>
         </h2>
         <p>
-          For reps who want to go further, the Inner Circle is a small, application-only group of
-          serious medical sales professionals. Members get weekly strategy calls, deal reviews,
-          shared playbooks and a network of people building the same kind of business.
+          The Inner Circle is a small, application-only group for reps already producing $10k a
+          month in medical or health sales who want help growing steadily toward $50k&ndash;$100k a
+          month. Through hands-on coaching and proven systems, members get weekly strategy calls,
+          deal reviews, shared playbooks and a network of people building the same kind of business.
         </p>
         <p className="lux-card-price">By application only</p>
         <a className="lux-cta" href={INNER_CIRCLE_URL} target="_blank" rel="noreferrer">
