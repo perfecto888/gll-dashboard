@@ -3,8 +3,8 @@ import { LuxPage, LuxVideo } from "../lux";
 export const metadata = { title: "Medical Sales Masters — Pre-Interview Session" };
 
 // Calendly redirects here after a candidate books (peptide and NS100 interviews).
-// Paste the YouTube video ID here once the webinar is recorded (the part after "v=").
-const WEBINAR_VIDEO_ID = "";
+// Loom recording of the webinar (loom.com/share/<id>).
+const WEBINAR_LOOM_ID = "71e1d6b80faa451b8e69903891d110cc";
 // Inner Circle application (Typeform E3nxrY86); the hidden "source" field records where applicants came from.
 const INNER_CIRCLE_URL = "https://form.typeform.com/to/E3nxrY86#source=webinar";
 
@@ -24,7 +24,7 @@ export default function WebinarPage() {
         together.
       </p>
 
-      <LuxVideo videoId={WEBINAR_VIDEO_ID} title="Medical Sales Masters - Pre-Interview Session" pending="Webinar coming soon" />
+      <LuxVideo loomId={WEBINAR_LOOM_ID} title="Medical Sales Masters - Pre-Interview Session" pending="Webinar coming soon" />
 
       <section className="lux-card">
         <p className="lux-eyebrow">Application Only</p>
