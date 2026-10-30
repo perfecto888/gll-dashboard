@@ -8,11 +8,13 @@ import { brevo } from "@/lib/email";
 export const dynamic = "force-dynamic";
 
 // Public (middleware-excluded) endpoint behind /apply/affiliate/application.
-// Saves the application to the HR tab, adds the lead to the Brevo list, appends a Google Sheet row,
+// Saves the application to the HR tab, adds the lead to the Brevo list, appends a Google Sheet row, emails Sam a review,
 // then the client sends them on to the Quantis affiliate signup.
 const BREVO_LIST_ID = 29; // "GLL - Reject Candidates Quantis Affiliates"
 const SHEET_ID = "1BOlkizK_HrccSZu3tYF2LRLr3Wr4hJTZuyBn0iv8X2E"; // "GLL - Quantis Affiliate Applications" (sam@ Drive)
 const NEXT_URL = "https://quantispeptides.com/affiliate_signup.php?src=gll";
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
+const NOTIFY_TO = "sam@goldenlotuslabs.com";
 
 const str = (v: unknown, max = 500) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const pick = (v: unknown, allowed: string[]) => (Array.isArray(v) ? v.filter((x) => allowed.includes(x)) : []);
@@ -39,6 +41,30 @@ async function addToBrevoList(email: string, first: string, last: string) {
     if (!/already exist/i.test((e as Error).message)) throw e;
     await brevo(`/contacts/lists/${BREVO_LIST_ID}/contacts/add`, "POST", { emails: [email] });
   }
+}
+
+const esc = (v: string) => v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
+// Review email to Sam with every answer and a link to the applications sheet.
+async function notifySam(rows: [string, string][], candidateMatch: boolean) {
+  const table = rows
+    .map(([q, a]) => `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e2da;color:#6b6457;vertical-align:top;width:38%">${esc(q)}</td>`
+      + `<td style="padding:8px 12px;border-bottom:1px solid #e5e2da;color:#111;white-space:pre-wrap">${esc(a || "—")}</td></tr>`)
+    .join("");
+  const html = `<div style="font-family:Arial,sans-serif;max-width:640px">
+    <h2 style="margin:0 0 6px;color:#0e1729">New Quantis affiliate application</h2>
+    <p style="margin:0 0 16px;color:#6b6457">${candidateMatch ? "This email matches a candidate in the HR tab (unverified)." : "No matching candidate in the HR tab."}
+      They were added to Brevo list #${BREVO_LIST_ID} and sent on to the Quantis affiliate signup.</p>
+    <table style="border-collapse:collapse;width:100%;font-size:14px">${table}</table>
+    <p style="margin:20px 0 0"><a href="${SHEET_URL}" style="background:#c9a84c;color:#0b0b0b;padding:12px 20px;text-decoration:none;font-weight:bold;display:inline-block">Open the applications Google Sheet</a></p>
+    <p style="margin:12px 0 0;font-size:12px;color:#6b6457">All applications are also in the dashboard HR tab.</p>
+  </div>`;
+  await brevo("/smtp/email", "POST", {
+    sender: { name: "GLL Dashboard", email: "sam@goldenlotuslabs.com" },
+    to: [{ email: NOTIFY_TO, name: "Sam Harish" }],
+    subject: "NEW QUANTIS AFFILIATE",
+    htmlContent: html,
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -76,14 +102,21 @@ export async function POST(req: NextRequest) {
 
   // Brevo and the sheet are best-effort: the application is already saved, so never block the applicant on them.
   const [first, ...rest] = name.split(/\s+/);
-  const [brevoRes, sheetRes] = await Promise.allSettled([
+  const [brevoRes, sheetRes, notifyRes] = await Promise.allSettled([
     addToBrevoList(email, first, rest.join(" ")),
     appendSheetRow([
       new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }),
       name, email, phone, location, channels.join(", "), audience, handle, background.join(", "), promoPlan,
       "Yes", "Yes", candidateId ? "Yes (email match)" : "No",
     ]),
+    notifySam([
+      ["Name", name], ["Email", email], ["Phone", phone], ["City / state", location],
+      ["Where they'll share", channels.join(", ")], ["Audience size", audience], ["Handle / website", handle],
+      ["Background", background.join(", ")], ["Promotion plan", promoPlan],
+      ["18 or older", "Yes"], ["Compliance agreement", "Yes"],
+    ], candidateId !== null),
   ]);
+  if (notifyRes.status === "rejected") console.error("[affiliate-apply] Notify:", notifyRes.reason);
   if (brevoRes.status === "rejected") console.error("[affiliate-apply] Brevo:", brevoRes.reason);
   if (sheetRes.status === "rejected") console.error("[affiliate-apply] Sheet:", sheetRes.reason);
   await db.execute({
