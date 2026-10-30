@@ -6,11 +6,12 @@ import "./lux.css";
 const display = Cormorant_Garamond({ subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"], variable: "--lux-display" });
 const body = DM_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--lux-body" });
 
-export function LuxPage({ sub, children }: { sub: string; children: React.ReactNode }) {
+// brand/theme let a co-branded page (e.g. QuantisPeptides × GLL) reuse the shell; theme adds a modifier class.
+export function LuxPage({ sub, brand = "Golden Lotus Labs", theme, children }: { sub: string; brand?: string; theme?: string; children: React.ReactNode }) {
   return (
-    <div className={`lux-page ${display.variable} ${body.variable}`}>
+    <div className={`lux-page ${theme ? `lux-${theme}` : ""} ${display.variable} ${body.variable}`}>
       <header className="lux-header">
-        <div className="lux-brand">Golden Lotus Labs</div>
+        <div className="lux-brand">{brand}</div>
         <div className="lux-brand-sub">{sub}</div>
       </header>
       <main className="lux-wrap">{children}</main>
@@ -23,10 +24,11 @@ export function LuxPage({ sub, children }: { sub: string; children: React.ReactN
 
 /** YouTube embed in the gold frame, or a "coming soon" panel until a video ID is set. */
 // videoId is a YouTube ID; pass loomId instead for a Loom recording (the id in loom.com/share/<id>).
-export function LuxVideo({ videoId = "", loomId = "", title, pending }: { videoId?: string; loomId?: string; title: string; pending: string }) {
+// aspect overrides the frame ratio when a recording isn't the default Loom shape.
+export function LuxVideo({ videoId = "", loomId = "", aspect, title, pending }: { videoId?: string; loomId?: string; aspect?: string; title: string; pending: string }) {
   if (loomId)
     return (
-      <div className="lux-video lux-video-loom">
+      <div className="lux-video lux-video-loom" style={aspect ? { aspectRatio: aspect } : undefined}>
         <iframe src={`https://www.loom.com/embed/${loomId}`} title={title} allowFullScreen />
       </div>
     );

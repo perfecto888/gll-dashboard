@@ -173,3 +173,35 @@
   .lux-lead, .lux-message { font-size: 15px; }
   .lux-cta { width: 100%; justify-content: center; padding: 18px 20px; }
 }
+
+/* QuantisPeptides × GLL co-brand (/apply/affiliate): Quantis navy under the same gold system */
+.lux-quantis {
+  --lux-bg: #0e1729;
+  --lux-panel: #16233d;
+  --lux-text: #f1ede3;
+  --lux-muted: #a3adbf;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201, 168, 76, 0.1), transparent 70%),
+    linear-gradient(160deg, #0d1424 0%, #13203a 100%);
+}
+.lux-section { width: 100%; margin-bottom: 52px; }
+.lux-section-title { font-family: var(--lux-display), Georgia, serif; font-weight: 400; font-size: clamp(28px, 4vw, 38px); line-height: 1.15; margin: 0 0 24px; }
+.lux-section-title em { font-style: italic; color: var(--lux-gold-light); }
+.lux-points.lux-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.lux-points.lux-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.lux-quantis .lux-point { background: var(--lux-panel); }
+.lux-points.lux-flush { margin-bottom: 0; }
+.lux-rules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; }
+.lux-rule-item { text-align: left; background: var(--lux-panel, #0d0d0d); border-left: 2px solid var(--lux-gold); padding: 18px 20px; font-size: 14px; line-height: 1.65; color: var(--lux-muted); }
+.lux-rule-item strong { color: var(--lux-text); font-weight: 600; }
+.lux-stat { display: flex; align-items: center; gap: 32px; width: 100%; text-align: left; border: 1px solid var(--lux-gold-border); border-top: 2px solid var(--lux-gold);
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.07), transparent 70%); padding: 32px 36px; }
+.lux-stat-num { font-family: var(--lux-display), Georgia, serif; font-size: clamp(64px, 11vw, 104px); line-height: 0.9; color: var(--lux-gold); flex-shrink: 0; }
+.lux-stat h3 { font-size: 18px; font-weight: 600; margin: 0 0 8px; color: var(--lux-text); }
+.lux-stat p { font-size: 14px; line-height: 1.65; color: var(--lux-muted); margin: 0; }
+.lux-note { font-size: 14px; line-height: 1.7; color: var(--lux-muted); margin: 20px 0 0; }
+
+@media (max-width: 760px) {
+  .lux-points.lux-cols-2, .lux-points.lux-cols-4, .lux-rules { grid-template-columns: 1fr; }
+  .lux-stat { flex-direction: column; align-items: flex-start; gap: 14px; padding: 26px 22px; }
+}
