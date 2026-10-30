@@ -232,3 +232,6 @@
 .lux-form .lux-cta:disabled { opacity: 0.6; cursor: wait; }
 .lux-form .lux-note { text-align: center; margin: 0; }
 @media (max-width: 600px) { .lux-form-grid { grid-template-columns: 1fr; } }
+
+/* Wider-than-column video frame; the centered flex column lets it spill evenly on both sides */
+.lux-video.lux-video-wide { width: min(1240px, calc(100vw - 48px)); flex-shrink: 0; }

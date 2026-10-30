@@ -3,7 +3,7 @@ import { LuxPage, LuxVideo } from "../lux";
 export const metadata = { title: "QuantisPeptides Affiliate Program — Golden Lotus Labs" };
 
 // Loom walkthrough of the affiliate program (loom.com/share/<id>); recorded at ~2.39:1, not Loom's usual frame.
-const LOOM_VIDEO_ID = "5b4d962a65ad4cf1884944f11de617c2";
+const LOOM_VIDEO_ID = "a7d18819ce7c41a0916411d0a166cf10";
 // Short application first (HR tab + Brevo list #29 + sheet), which then forwards to the Quantis signup.
 const SIGNUP_URL = "/apply/affiliate/application";
 
@@ -24,7 +24,7 @@ export default function QuantisAffiliatePage() {
         calls and no clinic relationships needed. Watch the walkthrough below.
       </p>
 
-      <LuxVideo loomId={LOOM_VIDEO_ID} aspect="1920 / 802" title="QuantisPeptides Affiliate Program Overview" pending="Program overview video coming soon" />
+      <LuxVideo loomId={LOOM_VIDEO_ID} aspect="1920 / 802" wide title="QuantisPeptides Affiliate Program Overview" pending="Program overview video coming soon" />
 
       <a className="lux-cta" href={SIGNUP_URL} style={{ marginBottom: 64 }}>
         Become an Affiliate <span aria-hidden="true">→</span>

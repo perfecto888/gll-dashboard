@@ -24,11 +24,12 @@ export function LuxPage({ sub, brand = "Golden Lotus Labs", theme, children }: {
 
 /** YouTube embed in the gold frame, or a "coming soon" panel until a video ID is set. */
 // videoId is a YouTube ID; pass loomId instead for a Loom recording (the id in loom.com/share/<id>).
-// aspect overrides the frame ratio when a recording isn't the default Loom shape.
-export function LuxVideo({ videoId = "", loomId = "", aspect, title, pending }: { videoId?: string; loomId?: string; aspect?: string; title: string; pending: string }) {
+// aspect overrides the frame ratio when a recording isn't the default Loom shape; wide lets the frame
+// extend past the 880px text column.
+export function LuxVideo({ videoId = "", loomId = "", aspect, wide, title, pending }: { videoId?: string; loomId?: string; aspect?: string; wide?: boolean; title: string; pending: string }) {
   if (loomId)
     return (
-      <div className="lux-video lux-video-loom" style={aspect ? { aspectRatio: aspect } : undefined}>
+      <div className={`lux-video lux-video-loom${wide ? " lux-video-wide" : ""}`} style={aspect ? { aspectRatio: aspect } : undefined}>
         <iframe src={`https://www.loom.com/embed/${loomId}`} title={title} allowFullScreen />
       </div>
     );
