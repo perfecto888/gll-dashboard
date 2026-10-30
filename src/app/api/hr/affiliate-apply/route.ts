@@ -38,7 +38,7 @@ async function addToBrevoList(email: string, first: string, last: string) {
   try {
     await brevo("/contacts", "POST", { email, attributes: { FIRSTNAME: first, LASTNAME: last }, listIds: [BREVO_LIST_ID] });
   } catch (e) {
-    if (!/already exist/i.test((e as Error).message)) throw e;
+    if (!/already (exist|associated)/i.test((e as Error).message)) throw e;
     await brevo(`/contacts/lists/${BREVO_LIST_ID}/contacts/add`, "POST", { emails: [email] });
   }
 }
