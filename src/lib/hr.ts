@@ -27,6 +27,23 @@ export function ensureHrSchema(): Promise<void> {
           )`,
           `CREATE INDEX IF NOT EXISTS idx_candidates_appt ON candidates(appt_start)`,
           `CREATE UNIQUE INDEX IF NOT EXISTS idx_candidates_calendly_event ON candidates(calendly_event_uri) WHERE calendly_event_uri IS NOT NULL`,
+          // Quantis affiliate applications from /apply/affiliate/application (non-fit sales applicants)
+          `CREATE TABLE IF NOT EXISTS affiliate_applications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            candidate_id INTEGER,                  -- matching candidates row by email, if they interviewed
+            name TEXT,
+            email TEXT,
+            phone TEXT,
+            location TEXT,
+            channels TEXT,                         -- comma-separated
+            audience_size TEXT,
+            handle TEXT,
+            background TEXT,                       -- comma-separated
+            promo_plan TEXT,
+            brevo_ok INTEGER NOT NULL DEFAULT 0,
+            sheet_ok INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT DEFAULT (datetime('now'))
+          )`,
         ],
         "write"
       )

@@ -12,7 +12,8 @@ export async function GET() {
        CASE WHEN appt_start IS NOT NULL AND appt_start >= datetime('now') THEN 0 ELSE 1 END,
        appt_start ASC, id DESC`
   );
-  return NextResponse.json({ candidates: r.rows });
+  const apps = await getDb().execute(`SELECT * FROM affiliate_applications ORDER BY id DESC`);
+  return NextResponse.json({ candidates: r.rows, affiliateApps: apps.rows });
 }
 
 // POST { action: "create", name?, email?, phone?, source? }

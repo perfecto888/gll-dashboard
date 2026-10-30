@@ -4,9 +4,8 @@ export const metadata = { title: "QuantisPeptides Affiliate Program — Golden L
 
 // Loom walkthrough of the affiliate program (loom.com/share/<id>); recorded at ~2.39:1, not Loom's usual frame.
 const LOOM_VIDEO_ID = "5b4d962a65ad4cf1884944f11de617c2";
-// src=gll tags signups that came from this page so quantispeptides.com can file them in the
-// "GLL - Reject Applicants Quantis Affiliate" Brevo list.
-const SIGNUP_URL = "https://quantispeptides.com/affiliate_signup.php?src=gll";
+// Short application first (HR tab + Brevo list #29 + sheet), which then forwards to the Quantis signup.
+const SIGNUP_URL = "/apply/affiliate/application";
 
 // For sales applicants who aren't a fit for the B2B clinic role. Copy follows the
 // "Quantis Affiliate Quick Start" deck, including its research-use-only and no-health-claims rules.
@@ -27,7 +26,7 @@ export default function QuantisAffiliatePage() {
 
       <LuxVideo loomId={LOOM_VIDEO_ID} aspect="1920 / 802" title="QuantisPeptides Affiliate Program Overview" pending="Program overview video coming soon" />
 
-      <a className="lux-cta" href={SIGNUP_URL} target="_blank" rel="noreferrer" style={{ marginBottom: 64 }}>
+      <a className="lux-cta" href={SIGNUP_URL} style={{ marginBottom: 64 }}>
         Become an Affiliate <span aria-hidden="true">→</span>
       </a>
 
@@ -85,7 +84,7 @@ export default function QuantisAffiliatePage() {
         <p className="lux-signoff">Ready? Apply in two minutes.</p>
       </div>
 
-      <a className="lux-cta" href={SIGNUP_URL} target="_blank" rel="noreferrer">
+      <a className="lux-cta" href={SIGNUP_URL}>
         Become an Affiliate <span aria-hidden="true">→</span>
       </a>
 

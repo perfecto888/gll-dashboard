@@ -21,6 +21,23 @@ interface Candidate {
   created_at: string;
 }
 
+interface AffiliateApp {
+  id: number;
+  candidate_id: number | null;
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  channels: string;
+  audience_size: string;
+  handle: string | null;
+  background: string;
+  promo_plan: string;
+  brevo_ok: number;
+  sheet_ok: number;
+  created_at: string;
+}
+
 function Card({ title, children, right, wide }: { title: string; children: React.ReactNode; right?: React.ReactNode; wide?: boolean }) {
   return (
     <section className={`card${wide ? " wide" : ""}`}>
@@ -48,6 +65,8 @@ function fmtWhen(iso: string | null) {
 
 export default function HRStudio() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [affiliateApps, setAffiliateApps] = useState<AffiliateApp[]>([]);
+  const [openApp, setOpenApp] = useState<number | null>(null);
   const [busy, setBusy] = useState("");
   const [msg, setMsg] = useState("");
   const [expanded, setExpanded] = useState<number | null>(null);
@@ -55,7 +74,7 @@ export default function HRStudio() {
   const [newEmail, setNewEmail] = useState("");
 
   const load = useCallback(() => {
-    fetch("/api/hr/candidates").then((r) => r.json()).then((j) => setCandidates(j.candidates ?? [])).catch(() => {});
+    fetch("/api/hr/candidates").then((r) => r.json()).then((j) => { setCandidates(j.candidates ?? []); setAffiliateApps(j.affiliateApps ?? []); }).catch(() => {});
   }, []);
   useEffect(load, [load]);
 
@@ -206,6 +225,42 @@ export default function HRStudio() {
       <Card title={`No appointment yet (${noAppt.length})`} wide>
         {!noAppt.length ? <p className="empty">Everyone has a time booked.</p> : (
           <div className="candidate-list">{noAppt.map(row)}</div>
+        )}
+      </Card>
+
+      <Card title={`Quantis affiliate applications (${affiliateApps.length})`} wide>
+        <p className="hint" style={{ marginTop: 0 }}>
+          From <code>/apply/affiliate/application</code>. Each one is also added to Brevo list #29 and the
+          &ldquo;GLL - Quantis Affiliate Applications&rdquo; Google Sheet.
+        </p>
+        {!affiliateApps.length ? <p className="empty">No applications yet.</p> : (
+          <div className="candidate-list">
+            {affiliateApps.map((a) => (
+              <div key={a.id} className="candidate-row">
+                <div className="candidate-summary" onClick={() => setOpenApp(openApp === a.id ? null : a.id)}>
+                  <div>
+                    <div className="candidate-name">{a.name} <span className="dim">{a.email}</span></div>
+                    <div className="dim" style={{ fontSize: 12 }}>
+                      {fmtWhen(a.created_at.replace(" ", "T") + "Z")} · {a.audience_size} · {a.channels.split(",").join(", ")}
+                    </div>
+                  </div>
+                  <div className="dim" style={{ fontSize: 12, textAlign: "right" }}>
+                    {a.candidate_id ? "Interviewed candidate" : "New contact"}
+                    {(!a.brevo_ok || !a.sheet_ok) && <div style={{ color: "var(--warn, #d9a400)" }}>{!a.brevo_ok && "Brevo failed "}{!a.sheet_ok && "Sheet failed"}</div>}
+                  </div>
+                </div>
+                {openApp === a.id && (
+                  <div className="candidate-detail" style={{ fontSize: 13, lineHeight: 1.7 }}>
+                    <div><b>Phone:</b> {a.phone}</div>
+                    <div><b>Location:</b> {a.location}</div>
+                    <div><b>Handle / website:</b> {a.handle || "—"}</div>
+                    <div><b>Background:</b> {a.background.split(",").join(", ")}</div>
+                    <div><b>Promotion plan:</b> {a.promo_plan}</div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </Card>
 
