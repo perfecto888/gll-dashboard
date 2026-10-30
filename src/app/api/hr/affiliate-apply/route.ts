@@ -30,6 +30,17 @@ async function appendSheetRow(row: string[]) {
   });
 }
 
+// Unauthenticated input, so never overwrite an existing Brevo contact's attributes: create new contacts,
+// and for an email Brevo already has, only add it to the list.
+async function addToBrevoList(email: string, first: string, last: string) {
+  try {
+    await brevo("/contacts", "POST", { email, attributes: { FIRSTNAME: first, LASTNAME: last }, listIds: [BREVO_LIST_ID] });
+  } catch (e) {
+    if (!/already exist/i.test((e as Error).message)) throw e;
+    await brevo(`/contacts/lists/${BREVO_LIST_ID}/contacts/add`, "POST", { emails: [email] });
+  }
+}
+
 export async function POST(req: NextRequest) {
   const b = await req.json().catch(() => null);
   if (!b) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
@@ -66,11 +77,11 @@ export async function POST(req: NextRequest) {
   // Brevo and the sheet are best-effort: the application is already saved, so never block the applicant on them.
   const [first, ...rest] = name.split(/\s+/);
   const [brevoRes, sheetRes] = await Promise.allSettled([
-    brevo("/contacts", "POST", { email, attributes: { FIRSTNAME: first, LASTNAME: rest.join(" ") }, listIds: [BREVO_LIST_ID], updateEnabled: true }),
+    addToBrevoList(email, first, rest.join(" ")),
     appendSheetRow([
       new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }),
       name, email, phone, location, channels.join(", "), audience, handle, background.join(", "), promoPlan,
-      "Yes", "Yes", candidateId ? "Yes" : "No",
+      "Yes", "Yes", candidateId ? "Yes (email match)" : "No",
     ]),
   ]);
   if (brevoRes.status === "rejected") console.error("[affiliate-apply] Brevo:", brevoRes.reason);

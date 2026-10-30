@@ -30,7 +30,7 @@ export function ensureHrSchema(): Promise<void> {
           // Quantis affiliate applications from /apply/affiliate/application (non-fit sales applicants)
           `CREATE TABLE IF NOT EXISTS affiliate_applications (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            candidate_id INTEGER,                  -- matching candidates row by email, if they interviewed
+            candidate_id INTEGER,                  -- candidates row with the same (unverified, self-typed) email
             name TEXT,
             email TEXT,
             phone TEXT,

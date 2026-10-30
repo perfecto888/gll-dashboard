@@ -245,7 +245,7 @@ export default function HRStudio() {
                     </div>
                   </div>
                   <div className="dim" style={{ fontSize: 12, textAlign: "right" }}>
-                    {a.candidate_id ? "Interviewed candidate" : "New contact"}
+                    {a.candidate_id ? "Email matches a candidate" : "No candidate match"}
                     {(!a.brevo_ok || !a.sheet_ok) && <div style={{ color: "var(--warn, #d9a400)" }}>{!a.brevo_ok && "Brevo failed "}{!a.sheet_ok && "Sheet failed"}</div>}
                   </div>
                 </div>
